@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Schedule</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Upcoming Matches</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="players.html">Players</a></li>
+                <li><a href="admin.html">Admin Panel</a></li>
+                <li><a href="contact.html">Contact</a></li>
+
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div id="match-container"></div>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const matchContainer = document.getElementById("match-container");
+            const matches = JSON.parse(localStorage.getItem("matches")) || [];
+
+            if (matches.length === 0) {
+                matchContainer.innerHTML = "<p>No matches scheduled.</p>";
+            } else {
+                matches.forEach(match => {
+                    const matchCard = document.createElement("div");
+                    matchCard.classList.add("match-card");
+                    matchCard.innerHTML = `
+                        <h3>${match.opponent}</h3>
+                        <p>Date: ${match.date}</p>
+                        <p>Venue: ${match.venue}</p>
+                    `;
+                    matchContainer.appendChild(matchCard);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

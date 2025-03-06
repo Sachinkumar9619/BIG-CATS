@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Team Players</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="schedule.html">Match Schedule</a></li>
+                <li><a href="admin.html">Admin Panel</a></li>
+                <li><a href="contact.html">Contact</a></li>
+
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div id="players-container"></div>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const playersContainer = document.getElementById("players-container");
+            const players = JSON.parse(localStorage.getItem("players")) || [];
+
+            if (players.length === 0) {
+                playersContainer.innerHTML = "<p>No players added yet.</p>";
+            } else {
+                players.forEach(player => {
+                    const playerCard = document.createElement("div");
+                    playerCard.classList.add("player-card");
+                    playerCard.innerHTML = `
+                        <h3>${player.name}</h3>
+                        <p>Role: ${player.role}</p>
+                        <img src="players/${player.image}" alt="${player.name}" width="100">
+                    `;
+                    playersContainer.appendChild(playerCard);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
