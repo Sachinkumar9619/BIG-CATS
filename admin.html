@@ -23,38 +23,49 @@
         <h2>Manage Players</h2>
         <form id="player-form">
             <input type="text" id="player-name" placeholder="Player Name" required>
-            <input type="text" id="player-role" placeholder="Role (Batsman/Bowler)" required>
+            
+            <select id="player-role" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="Batsman">Batsman</option>
+                <option value="Bowler">Bowler</option>
+                <option value="All-rounder">All-rounder</option>
+                <option value="Wicketkeeper-Batsman">Wicketkeeper-Batsman</option>
+            </select>
+
+            <input type="file" id="player-image" accept="image/*" required>
             <button type="submit">Add Player</button>
         </form>
+
         <h3>Player List</h3>
         <ul id="player-list"></ul>
-
-        <h2>Manage Match Schedule</h2>
-        <form id="match-form">
-            <input type="text" id="match-date" placeholder="Match Date (YYYY-MM-DD)" required>
-            <input type="text" id="match-opponent" placeholder="Opponent Team" required>
-            <button type="submit">Add Match</button>
-        </form>
-        <h3>Upcoming Matches</h3>
-        <ul id="match-list"></ul>
-
-        <h2>Contact Messages</h2>
-        <div id="messages-container"></div>
     </main>
 
     <script>
-        // Manage Players
+        function getBase64(file, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => callback(reader.result);
+            reader.onerror = error => console.error("Error: ", error);
+        }
+
         document.getElementById("player-form").addEventListener("submit", function (e) {
             e.preventDefault();
             const name = document.getElementById("player-name").value;
             const role = document.getElementById("player-role").value;
+            const imageFile = document.getElementById("player-image").files[0];
 
-            const players = JSON.parse(localStorage.getItem("players")) || [];
-            players.push({ name, role });
-            localStorage.setItem("players", JSON.stringify(players));
+            if (!imageFile) {
+                alert("Please select an image.");
+                return;
+            }
 
-            loadPlayers();
-            this.reset();
+            getBase64(imageFile, (imageBase64) => {
+                const players = JSON.parse(localStorage.getItem("players")) || [];
+                players.push({ name, role, image: imageBase64 });
+                localStorage.setItem("players", JSON.stringify(players));
+                loadPlayers();
+                document.getElementById("player-form").reset();
+            });
         });
 
         function loadPlayers() {
@@ -64,8 +75,11 @@
 
             players.forEach((player, index) => {
                 const li = document.createElement("li");
-                li.innerHTML = `${player.name} - ${player.role} 
-                    <button onclick="removePlayer(${index})">Remove</button>`;
+                li.innerHTML = `
+                    <img src="${player.image}" alt="${player.name}" width="50" height="50" style="border-radius:50%;">
+                    <strong>${player.name}</strong> - ${player.role} 
+                    <button onclick="removePlayer(${index})">Remove</button>
+                `;
                 playerList.appendChild(li);
             });
         }
@@ -77,64 +91,7 @@
             loadPlayers();
         }
 
-        // Manage Match Schedule
-        document.getElementById("match-form").addEventListener("submit", function (e) {
-            e.preventDefault();
-            const date = document.getElementById("match-date").value;
-            const opponent = document.getElementById("match-opponent").value;
-
-            const matches = JSON.parse(localStorage.getItem("matches")) || [];
-            matches.push({ date, opponent });
-            localStorage.setItem("matches", JSON.stringify(matches));
-
-            loadMatches();
-            this.reset();
-        });
-
-        function loadMatches() {
-            const matchList = document.getElementById("match-list");
-            matchList.innerHTML = "";
-            const matches = JSON.parse(localStorage.getItem("matches")) || [];
-
-            matches.forEach((match, index) => {
-                const li = document.createElement("li");
-                li.innerHTML = `${match.date} vs ${match.opponent} 
-                    <button onclick="removeMatch(${index})">Remove</button>`;
-                matchList.appendChild(li);
-            });
-        }
-
-        function removeMatch(index) {
-            let matches = JSON.parse(localStorage.getItem("matches")) || [];
-            matches.splice(index, 1);
-            localStorage.setItem("matches", JSON.stringify(matches));
-            loadMatches();
-        }
-
-        // Load Contact Messages
-        function loadMessages() {
-            const messagesContainer = document.getElementById("messages-container");
-            messagesContainer.innerHTML = "";
-            const messages = JSON.parse(localStorage.getItem("messages")) || [];
-
-            if (messages.length === 0) {
-                messagesContainer.innerHTML = "<p>No messages yet.</p>";
-            } else {
-                messages.forEach(msg => {
-                    const msgDiv = document.createElement("div");
-                    msgDiv.classList.add("message-card");
-                    msgDiv.innerHTML = `<p><strong>${msg.name} (${msg.phone})</strong>: ${msg.message}</p>`;
-                    messagesContainer.appendChild(msgDiv);
-                });
-            }
-        }
-
-        // Load all data on page load
-        document.addEventListener("DOMContentLoaded", () => {
-            loadPlayers();
-            loadMatches();
-            loadMessages();
-        });
+        document.addEventListener("DOMContentLoaded", loadPlayers);
     </script>
 </body>
 </html>
