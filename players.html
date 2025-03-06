@@ -101,8 +101,12 @@
                 players.forEach(player => {
                     const playerCard = document.createElement("div");
                     playerCard.classList.add("player-card");
+
+                    // Ensure proper image path handling
+                    let imageUrl = player.image.startsWith("data:image") ? player.image : `players/${player.image}`;
+
                     playerCard.innerHTML = `
-                        <img src="players/${player.image}" alt="${player.name}">
+                        <img src="${imageUrl}" alt="${player.name}">
                         <h3>${player.name}</h3>
                         <p>Role: ${player.role}</p>
                     `;
